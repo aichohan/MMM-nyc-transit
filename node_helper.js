@@ -127,14 +127,16 @@ module.exports = NodeHelper.create({
 
             if (i.destinationStationId !== undefined && dirDownTown[n]) {
               try {
-                // Get destination name with fallback
+                // Get destination name with fallback and logging for debugging
                 let destinationName = 'Unknown Destination'
                 if (i.destinationStationId === '281' && stationIds['606']) {
                   destinationName = stationIds['606'].name
                 } else if (stationIds[i.destinationStationId]) {
                   destinationName = stationIds[i.destinationStationId].name
                 } else {
-                  destinationName = `Station ${i.destinationStationId}`
+                  // Log missing destinations for debugging terminal stations like Hudson Yards
+                  console.log(`Missing destination: ${i.destinationStationId} for route ${i.routeId}`)
+                  destinationName = `${i.routeId} Train`
                 }
 
                 downTown.push({
@@ -162,14 +164,16 @@ module.exports = NodeHelper.create({
 
             if (i.destinationStationId !== undefined && dirUpTown[n]) {
               try {
-                // Get destination name with fallback
+                // Get destination name with fallback and logging for debugging
                 let destinationName = 'Unknown Destination'
                 if (i.destinationStationId === '281' && stationIds['606']) {
                   destinationName = stationIds['606'].name
                 } else if (stationIds[i.destinationStationId]) {
                   destinationName = stationIds[i.destinationStationId].name
                 } else {
-                  destinationName = `Station ${i.destinationStationId}`
+                  // Log missing destinations for debugging terminal stations like Hudson Yards
+                  console.log(`Missing destination: ${i.destinationStationId} for route ${i.routeId}`)
+                  destinationName = `${i.routeId} Train`
                 }
 
                 upTown.push({
