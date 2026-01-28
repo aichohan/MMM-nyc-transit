@@ -100,7 +100,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
       var upTown = data[1].upTown
 
       if (Object.keys(data).length === 0 && data.constructor === Object) {
-        return this.addErrorsToWrapper(wrapper)
+        return wrapper
       }
 
       if (isList) {
@@ -217,7 +217,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
 
         wrapper.appendChild(list)
 
-        return this.addErrorsToWrapper(wrapper)
+        return wrapper
       } else {
         for (var upMarKey in upTown) {
           if (
@@ -309,7 +309,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
 
         wrapper.appendChild(marquee)
 
-        return this.addErrorsToWrapper(wrapper)
+        return wrapper
       }
     }
     // observer mutation on targetNode with config obj
@@ -335,7 +335,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
 
       wrapper.appendChild(errorContainer)
     }
-    return this.addErrorsToWrapper(wrapper)
+    return wrapper
   },
 
   getStationName: function (stationId) {
