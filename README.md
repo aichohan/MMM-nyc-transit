@@ -30,7 +30,7 @@ All other stations continue to work as expected. If you were experiencing issues
 
 ## ℹ️ How to use this module
 
-1. clone this repo into your moducles directory with the following command: `git clone https://github.com/aichohan/MMM-nyc-transit-fixed`
+1. clone this repo into your moducles directory with the following command: `git clone https://github.com/aichohan/MMM-nyc-transit`
 2. install all the npm modules with either `yarn install` or `npm install`
 3. update your [MagicMirror² Config](https://github.com/MichMich/MagicMirror/blob/master/config/config.js.sample), by adding the following object:
 
