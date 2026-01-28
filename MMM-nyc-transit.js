@@ -39,6 +39,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
   },
 
   start: function () {
+    this.stationErrors = []  // Initialize error tracking
     this.getDepartures()
     this.scheduleUpdate()
   },
@@ -99,7 +100,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
       var upTown = data[1].upTown
 
       if (Object.keys(data).length === 0 && data.constructor === Object) {
-        return wrapper
+        return this.addErrorsToWrapper(wrapper)
       }
 
       if (isList) {
@@ -216,7 +217,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
 
         wrapper.appendChild(list)
 
-        return wrapper
+        return this.addErrorsToWrapper(wrapper)
       } else {
         for (var upMarKey in upTown) {
           if (
@@ -308,12 +309,16 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
 
         wrapper.appendChild(marquee)
 
-        return wrapper
+        return this.addErrorsToWrapper(wrapper)
       }
     }
     // observer mutation on targetNode with config obj
     observer.observe(targetNode, config)
 
+    return this.addErrorsToWrapper(wrapper)
+  },
+
+  addErrorsToWrapper: function(wrapper) {
     // Display station errors if any exist
     if (this.stationErrors && this.stationErrors.length > 0) {
       var errorContainer = document.createElement('div')
@@ -330,8 +335,7 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
 
       wrapper.appendChild(errorContainer)
     }
-
-    return wrapper
+    return this.addErrorsToWrapper(wrapper)
   },
 
   getStationName: function (stationId) {
