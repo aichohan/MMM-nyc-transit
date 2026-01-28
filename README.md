@@ -1,5 +1,22 @@
 # MTA transit module for MagicMirror²
 
+> **Note:** This is a fork of [elaniobro/MMM-nyc-transit](https://github.com/Elaniobro/MMM-nyc-transit) with fixes for Hudson Yards station departures.
+
+## 🔧 What's Fixed
+
+This fork addresses a critical bug where **Hudson Yards station (ID 471)** trains were not displaying in the module. The issue was caused by a nested loop bug in the departure processing logic that caused:
+
+- Duplicate processing of station data
+- Multiple socket notifications being sent
+- Hudson Yards 7 train departures being lost in processing conflicts
+
+**Changes made:**
+- Fixed nested loop bug in `node_helper.js` departure processing
+- Cleaned up socket notification flow
+- Ensured consistent processing for all stations
+
+All other stations continue to work as expected. If you were experiencing issues with Hudson Yards (34 St - 11 Av) not showing 7 train departures, this fix resolves that problem.
+
 ## 🛡 Badges
 <!-- Social info -->
 ![follow on Twitte](https://img.shields.io/twitter/follow/elaniobro?style=social&logo=twitter)  ![GitHub followers](https://img.shields.io/github/followers/elaniobro?style=social)
