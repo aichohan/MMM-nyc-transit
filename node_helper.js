@@ -25,18 +25,28 @@ module.exports = NodeHelper.create({
     var dirDownTown = config.stations.map((obj) => obj.dir.downTown)
     var isList = config.displayType !== 'marquee'
 
-    fs.readFile(
-      `${__dirname}/node_modules/mta-subway-complexes/complexes.json`,
-      'utf8'
-    )
-      .then((data) => {
-        stationIds = JSON.parse(data)
-      })
-      .catch((err) => {
-        throw new Error(err)
-      })
+    try {
+      // Load station complexes data before processing
+      const complexesData = await fs.readFile(
+        `${__dirname}/node_modules/mta-subway-complexes/complexes.json`,
+        'utf8'
+      )
+      stationIds = JSON.parse(complexesData)
+      console.log('✅ Loaded station complexes data')
 
-    await this.processStationsWithErrorHandling(stations, client, self, stationIds, walkingTime, dirUpTown, dirDownTown, mtaStationIds, isList)
+      await this.processStationsWithErrorHandling(stations, client, self, stationIds, walkingTime, dirUpTown, dirDownTown, mtaStationIds, isList)
+    } catch (err) {
+      console.log('❌ Failed to load complexes data:', err.message)
+      // Send error notification to frontend
+      self.sendSocketNotification('TRAIN_TABLE', {
+        stations: stations,
+        data: [{ downTown: [] }, { upTown: [] }],
+        errors: [{
+          stationId: 'system',
+          error: 'Failed to load station data: ' + err.message
+        }]
+      })
+    }
   },
 
   processStationsWithErrorHandling: async function(stations, client, self, stationIds, walkingTime, dirUpTown, dirDownTown, mtaStationIds, isList) {
@@ -117,13 +127,20 @@ module.exports = NodeHelper.create({
 
             if (i.destinationStationId !== undefined && dirDownTown[n]) {
               try {
+                // Get destination name with fallback
+                let destinationName = 'Unknown Destination'
+                if (i.destinationStationId === '281' && stationIds['606']) {
+                  destinationName = stationIds['606'].name
+                } else if (stationIds[i.destinationStationId]) {
+                  destinationName = stationIds[i.destinationStationId].name
+                } else {
+                  destinationName = `Station ${i.destinationStationId}`
+                }
+
                 downTown.push({
                   routeId: i.routeId,
                   time: this.getDate(i.time, walkingTime[n]),
-                  destination:
-                    i.destinationStationId === '281'
-                      ? stationIds['606'].name
-                      : stationIds[i.destinationStationId].name,
+                  destination: destinationName,
                   walkingTime: walkingTime[n],
                 })
               } catch (processingError) {
@@ -145,13 +162,20 @@ module.exports = NodeHelper.create({
 
             if (i.destinationStationId !== undefined && dirUpTown[n]) {
               try {
+                // Get destination name with fallback
+                let destinationName = 'Unknown Destination'
+                if (i.destinationStationId === '281' && stationIds['606']) {
+                  destinationName = stationIds['606'].name
+                } else if (stationIds[i.destinationStationId]) {
+                  destinationName = stationIds[i.destinationStationId].name
+                } else {
+                  destinationName = `Station ${i.destinationStationId}`
+                }
+
                 upTown.push({
                   routeId: i.routeId,
                   time: this.getDate(i.time, walkingTime[n]),
-                  destination:
-                    i.destinationStationId === '281'
-                      ? stationIds['606'].name
-                      : stationIds[i.destinationStationId].name,
+                  destination: destinationName,
                   walkingTime: walkingTime[n],
                 })
               } catch (processingError) {
