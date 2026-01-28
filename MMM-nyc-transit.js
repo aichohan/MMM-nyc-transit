@@ -314,8 +314,45 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
     // observer mutation on targetNode with config obj
     observer.observe(targetNode, config)
 
+    // Display station errors if any exist
+    if (this.stationErrors && this.stationErrors.length > 0) {
+      var errorContainer = document.createElement('div')
+      errorContainer.className = 'mta__error-container'
+      errorContainer.style.cssText = 'margin-top: 10px; font-size: 12px; color: #ff9999; opacity: 0.8;'
+
+      this.stationErrors.forEach((error) => {
+        var stationName = this.getStationName(error.stationId) || `Station ${error.stationId}`
+        var errorElement = document.createElement('div')
+        errorElement.className = 'mta__error-item'
+        errorElement.innerHTML = `⚠️ ${stationName}: Service temporarily unavailable`
+        errorContainer.appendChild(errorElement)
+      })
+
+      wrapper.appendChild(errorContainer)
+    }
+
     return wrapper
   },
+
+  getStationName: function (stationId) {
+    // Find station name from config or use common station names
+    var stationNames = {
+      471: 'Hudson Yards (7 Train)',
+      164: 'ACE Station',
+      318: 'Penn Station',
+      // Add more as needed
+    }
+
+    // First try to find in config
+    var configStation = this.config.stations.find(s => s.stationId === stationId)
+    if (configStation && configStation.name) {
+      return configStation.name
+    }
+
+    // Fall back to known station names
+    return stationNames[stationId] || `Station ${stationId}`
+  },
+
   isExpress: function (id) {
     return id.split('').length === 2 ? 'express' : ''
   },
@@ -364,6 +401,16 @@ Module.register('MMM-nyc-transit', { /*eslint-disable-line*/
       console.log('socketNotificationReceived: "TRAIN_TABLE": ', this.result)
 
       this.result = payload['data']
+
+      // Handle station errors
+      if (payload['errors'] && payload['errors'].length > 0) {
+        this.stationErrors = payload['errors']
+        // eslint-disable-next-line no-console
+        console.log('Station errors received:', this.stationErrors)
+      } else {
+        this.stationErrors = []
+      }
+
       this.updateDom(this.config.fadeSpeed)
     } else if (notification === 'DOM_OBJECTS_CREATED') {
       // eslint-disable-next-line no-console
